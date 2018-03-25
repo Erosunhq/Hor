@@ -81,18 +81,12 @@ public class MainActivity extends AppCompatActivity {
                         .into(imageView);
             }
         });
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                imageView.setVisibility(View.INVISIBLE);
-            }
-        });
+
     }
 
     private void setData(){
         PicList = getImagePath.getImagePathFromSD();
     }
-
 
     private void setGridView() {
 
@@ -119,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         gridView.setAdapter(adapter);
     }
 
-    
+
     public class GridViewAdapter extends BaseAdapter {
 
         Context context;
