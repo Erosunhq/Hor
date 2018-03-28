@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     Button t;
     Button size;
     GetImagePath getImagePath;
+    com.example.sunhq.hor.GridViewAdapter gridViewAdapter;
 
     // 触摸图片缩放
     private ImageView imageView;
@@ -47,11 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private PointF mid = new PointF();//两指中点
     Context context;
 
+    private float startX, startY; //处理图片随手指平移,手指按下时X,Y坐标
     private Button back;
 
-    //初始化圆点高宽,java代码中操作的宽高都是像素值，dp*density转成px
-    int width = 40;
-    int height = 40;
 
 
     @Override
@@ -74,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
                 getImagePath = new GetImagePath("中式");
                 setData();
                 setGridView();
-                // System.out.print(PicList);
             }
         });
         size.setOnClickListener(new View.OnClickListener() {
@@ -97,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
                         .error(R.mipmap.ic_launcher)
                         .noFade()
                         .into(imageView);
-
                 imageView.setVisibility(View.VISIBLE);
                 back.setVisibility(View.VISIBLE);
                 t.setVisibility(View.GONE);
@@ -121,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         center();//缩小后居中
         imageView.setImageMatrix(matrix);
         matrix.setScale(1f, 1f); //显示
+        //imageView.setOnTouchListener(new DispatchTouchEvent());
 
         imageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -130,10 +128,10 @@ public class MainActivity extends AppCompatActivity {
                     // 单指触摸
                     case MotionEvent.ACTION_DOWN:
                         mode = 1;
-                        //Toast.makeText(MainActivity.this,"单指点击了图片",Toast.LENGTH_SHORT).show();
-                        /*FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width,height);
-                        params.setMargins((int)event.getX(),(int)event.getY(),0,0);
-                        view.setLayoutParams(params);*/
+                        //添加单指拖动,结合 ACTION_MOVE 中 mode = 1事件
+                        startX = event.getX();
+                        startY = event.getY(); //保存手指按下时的位置
+                        savedMatrix.set(matrix); //记录临时矩阵的信息  在此是位置信息
                         //添加单指拖动
                         break;
                     // 双指触摸
@@ -163,6 +161,15 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                         }
+                        if (mode == 1){
+                            // 把矩阵赋值为手指开始按下时的位置
+                            matrix.set(savedMatrix);
+                            //计算偏移量
+                            float x = event.getX() - startX;
+                            float y = event.getY() - startY;
+                            //开始移动
+                            matrix.postTranslate(x, y);
+                        }
                         break;
                 }
                 view.setImageMatrix(matrix);
@@ -172,7 +179,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
     }
+
+
 
     /*获取两指之间的距离*/
     private float getDistance(MotionEvent event) {
@@ -259,13 +269,13 @@ public class MainActivity extends AppCompatActivity {
         gridView.setStretchMode(GridView.NO_STRETCH);
         gridView.setNumColumns(size); // 重点
 
-        GridViewAdapter adapter = new GridViewAdapter(getApplicationContext(),
+        gridViewAdapter = new GridViewAdapter(getApplicationContext(),
                 PicList);
-        gridView.setAdapter(adapter);
+        gridView.setAdapter(gridViewAdapter);
     }
 
 
-    public class GridViewAdapter extends BaseAdapter {
+    /*public class GridViewAdapter extends BaseAdapter {
 
         Context context;
         List<String> list;
@@ -308,5 +318,5 @@ public class MainActivity extends AppCompatActivity {
 
             return convertView;
         }
-    }
+    }*/
 }

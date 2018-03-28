@@ -17,12 +17,7 @@ public class GetImagePath {
     public GetImagePath(String para){  //构造方法
         this.para = para;
     }
-    public  void setPara(String para){
-        this.para = para;
-    }
-    public String getPara(){
-        return para;
-    }
+
 
 
     public List<String> getImagePathFromSD(){
